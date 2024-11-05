@@ -1,3 +1,5 @@
 from .liblog import LibLog
 
-__all__ = ["LibLog"]
+liblog = LibLog().get_logger()
+
+__all__ = ["liblog"]

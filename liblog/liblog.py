@@ -9,24 +9,21 @@ import logging
 
 def get_caller_package_name() -> str:
     """Get the package name of the calling module."""
-    # Get the current frame, then go back in the stack to find the caller
+    # Get the current frame
     frame = inspect.currentframe()
 
-    # Go back two frames to reach the caller's frame
-    caller_frame = frame.f_back.f_back
+    # Get the outer frames
+    frames = inspect.getouterframes(frame)
 
-    # Get the module name from the caller's frame
-    caller_module = inspect.getmodule(caller_frame)
-
-    found_name = "Unknown"
-
-    # Retrieve the package name from the module
-    if caller_module and caller_module.__package__:
-        found_name = caller_module.__package__
-    elif caller_module:
-        # If no package, return the module's name
-        found_name = caller_module.__name__
-    return found_name
+    for f in frames:
+        # We find the first frame that is not from the liblog package and return its package name
+        if (
+            f is not None
+            and (module := inspect.getmodule(f[0])) is not None
+            and (package := module.__package__) != "liblog"
+        ):
+            return package
+    return "Unknown"
 
 
 class LibLog:
